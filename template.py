@@ -357,31 +357,31 @@ class NaiveBayes:
         assert alpha >= 0.0
 
         # Compute raw frequency distributions
-        labels = []
+        classes = []
 
-        for (features, label) in data:
-            labels.append(label)
+        for (features, c) in data:
+            classes.append(c)
 
-        occurrences = Counter(labels)
+        occurrences = Counter(classes)
 
         # Compute prior (MLE). Compute likelihood with smoothing.
         prior = dict()
-        for label in occurrences:
-            prior[label] = occurrences[label] / len(data)
+        for c in occurrences:
+            prior[c] = occurrences[c] / len(data)
 
         # Compute P(f|c)
         likelihood = dict()
-        for l in prior:
-            likelihood[l] = dict()
+        for c in prior:
+            likelihood[c] = dict()
             for feature in vocab:
                 count_feature = 0
                 count_total_features = 0
                 for (features, label) in data:
-                    if (label == l):
-                        c = Counter(features)
-                        count_feature += c[feature]
+                    if (label == c):
+                        counter = Counter(features)
+                        count_feature += counter[feature]
                         count_total_features += len(features)
-                likelihood[l][feature] = (count_feature + alpha) / (count_total_features + alpha * len(vocab))
+                likelihood[c][feature] = (count_feature + alpha) / (count_total_features + alpha * len(vocab))
 
         return (prior, likelihood)
 
@@ -395,12 +395,12 @@ class NaiveBayes:
         """
         probs = dict()
 
-        for label in self.prior:
-            prob = self.prior[label]
-            for i in d:
-                if (i in self.likelihood[label]):
-                    prob *= self.likelihood[label][i]
-        probs[label] = prob
+        for c in self.prior:
+            prob = self.prior[c]
+            for feature in d:
+                if (feature in self.likelihood[c]):
+                    prob *= self.likelihood[c][feature]
+        probs[c] = prob
 
         return probs
 
@@ -412,22 +412,13 @@ class NaiveBayes:
         :rtype: str
         :return: The most likely class.
         """
-        prob_labels = dict()
-
-        for label in self.prior:
-            prob_label = 1
-            for feature in d:
-                prob = prob_classify(feature)
-                prob_label *= prob[label]
-
-            prob_labels[label] = prob_label
-
+        prob = self.prob_classify(d)
         max = 0
         max_label = None
 
-        for x in prob_labels:
-            if (prob_labels[x] > max):
-                max = prob_labels[x]
+        for x in prob:
+            if (prob[x] > max):
+                max = prob[x]
                 max_label = x
 
         return max_label
@@ -512,53 +503,53 @@ def answers():
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
 
-    print("*** Part I***\n")
-
-    print("*** Question 1 ***")
-    print('Building brown bigram letter model ... ')
-    lm = train_LM(brown)
-    print('Letter model built')
-
-    print("*** Question 2 ***")
-    ents = tweet_ent(twitter_file_ids, lm)
-    print("Best 10 english entropies:")
-    best10_ents = ents[:10]
-    ppEandT(best10_ents)
-    print("Worst 10 english entropies:")
-    worst10_ents = ents[-10:]
-    ppEandT(worst10_ents)
-
-    print("*** Question 3 ***")
-    answer_open_question_3 = open_question_3()
-    print(answer_open_question_3)
-
-    print("*** Question 4 ***")
-    answer_open_question_4 = open_question_4()
-    print(answer_open_question_4)
-
-    print("*** Question 5 ***")
-    mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
-    print('Mean: {}'.format(mean))
-    print('Standard Deviation: {}'.format(std))
-    print('ASCII tweets ')
-    print("Best 10 English entropies:")
-    best10_ascci_ents = ascci_ents[:10]
-    ppEandT(best10_ascci_ents)
-    print("Worst 10 English entropies:")
-    worst10_ascci_ents = ascci_ents[-10:]
-    ppEandT(worst10_ascci_ents)
-    print('--------')
-    print('Tweets considered non-English')
-    print("Best 10 English entropies:")
-    best10_non_eng_ents = non_eng_ents[:10]
-    ppEandT(best10_non_eng_ents)
-    print("Worst 10 English entropies:")
-    worst10_non_eng_ents = non_eng_ents[-10:]
-    ppEandT(worst10_non_eng_ents)
-
-    print("*** Question 6 ***")
-    answer_open_question_6 = open_question_6()
-    print(answer_open_question_6)
+    # print("*** Part I***\n")
+    #
+    # print("*** Question 1 ***")
+    # print('Building brown bigram letter model ... ')
+    # lm = train_LM(brown)
+    # print('Letter model built')
+    #
+    # print("*** Question 2 ***")
+    # ents = tweet_ent(twitter_file_ids, lm)
+    # print("Best 10 english entropies:")
+    # best10_ents = ents[:10]
+    # ppEandT(best10_ents)
+    # print("Worst 10 english entropies:")
+    # worst10_ents = ents[-10:]
+    # ppEandT(worst10_ents)
+    #
+    # print("*** Question 3 ***")
+    # answer_open_question_3 = open_question_3()
+    # print(answer_open_question_3)
+    #
+    # print("*** Question 4 ***")
+    # answer_open_question_4 = open_question_4()
+    # print(answer_open_question_4)
+    #
+    # print("*** Question 5 ***")
+    # mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
+    # print('Mean: {}'.format(mean))
+    # print('Standard Deviation: {}'.format(std))
+    # print('ASCII tweets ')
+    # print("Best 10 English entropies:")
+    # best10_ascci_ents = ascci_ents[:10]
+    # ppEandT(best10_ascci_ents)
+    # print("Worst 10 English entropies:")
+    # worst10_ascci_ents = ascci_ents[-10:]
+    # ppEandT(worst10_ascci_ents)
+    # print('--------')
+    # print('Tweets considered non-English')
+    # print("Best 10 English entropies:")
+    # best10_non_eng_ents = non_eng_ents[:10]
+    # ppEandT(best10_non_eng_ents)
+    # print("Worst 10 English entropies:")
+    # worst10_non_eng_ents = non_eng_ents[-10:]
+    # ppEandT(worst10_non_eng_ents)
+    #
+    # print("*** Question 6 ***")
+    # answer_open_question_6 = open_question_6()
+    # print(answer_open_question_6)
 
 
     print("*** Part II***\n")
