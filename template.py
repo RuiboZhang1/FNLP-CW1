@@ -26,7 +26,9 @@ import numpy as np  # for np.mean() and np.std()
 import nltk, sys, inspect
 import nltk.corpus.util
 from nltk import MaxentClassifier
-from nltk.corpus import brown, ppattach  # import corpora
+import re
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import brown, ppattach, wordnet  # import corpora
 
 # Import the Twitter corpus and LgramModel
 from nltk_model import *  # See the README inside the nltk_model folder for more information
@@ -221,7 +223,11 @@ def open_question_3():
     :rtype: str
     :return: your answer [500 chars max]
     '''
-    return inspect.cleandoc("""...""")[0:500]
+    return inspect.cleandoc("""The main reason for the huge differences between entropies is the model we used, 
+    which is trained in English corpus. The model is confident in predicting tweets in English but struggling 
+    to predict non-English tweets. By inspecting the first 100 and last 100 tweets, it shows that tweets with low 
+    entropies are made up of English words. In contrast, tweets with high entropies are made up of non-English words,
+    typically Japanese in this corpus.""")[0:500]
 
 
 # Question 4 [8 marks]
@@ -232,7 +238,10 @@ def open_question_4() -> str:
     :rtype: str
     :return: your answer [500 chars max]
     '''
-    return inspect.cleandoc("""...""")[0:500]
+    return inspect.cleandoc("""-- Using isalpha() will keep many non-English words. We could use isascii() to filter words instead of isalpha().
+    -- There are many URLs, mentions and hashtags inside he data. Could replace them using re package. Replace (http\S*) | (@\S*) | (#\S*) with empty string.
+    -- There are many misspellings in the data, we should correct them before doing further training.
+    -- Some punctuation marks can be removed (e.g. "*" and "-" in "*Fad-ing*" by replacing [-;):(*] with empty string.""")[0:500]
 
 
 # Question 5 [15 marks]
@@ -471,8 +480,13 @@ def your_feature_extractor(v, n1, p, n2):
     :rtype: list(any)
     :return: A list of features produced by you.
     """
-    raise NotImplementedError  # remove when you finish defining this function
+    lemmatizer = WordNetLemmatizer()
 
+    # v = lemmatizer.lemmatize(v)
+    n1 = lemmatizer.lemmatize(n1)
+    #n2 = lemmatizer.lemmatize(n2)
+
+    return [("v", v), ("p", p), ("v+p", v+p), ("n1+p", n1+p), ("n2+p", n2+p)]
 
 # Question 9.2 [10 marks]
 def open_question_9():
@@ -503,53 +517,53 @@ def answers():
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
 
-    # print("*** Part I***\n")
-    #
-    # print("*** Question 1 ***")
-    # print('Building brown bigram letter model ... ')
-    # lm = train_LM(brown)
-    # print('Letter model built')
-    #
-    # print("*** Question 2 ***")
-    # ents = tweet_ent(twitter_file_ids, lm)
-    # print("Best 10 english entropies:")
-    # best10_ents = ents[:10]
-    # ppEandT(best10_ents)
-    # print("Worst 10 english entropies:")
-    # worst10_ents = ents[-10:]
-    # ppEandT(worst10_ents)
-    #
-    # print("*** Question 3 ***")
-    # answer_open_question_3 = open_question_3()
-    # print(answer_open_question_3)
-    #
-    # print("*** Question 4 ***")
-    # answer_open_question_4 = open_question_4()
-    # print(answer_open_question_4)
-    #
-    # print("*** Question 5 ***")
-    # mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
-    # print('Mean: {}'.format(mean))
-    # print('Standard Deviation: {}'.format(std))
-    # print('ASCII tweets ')
-    # print("Best 10 English entropies:")
-    # best10_ascci_ents = ascci_ents[:10]
-    # ppEandT(best10_ascci_ents)
-    # print("Worst 10 English entropies:")
-    # worst10_ascci_ents = ascci_ents[-10:]
-    # ppEandT(worst10_ascci_ents)
-    # print('--------')
-    # print('Tweets considered non-English')
-    # print("Best 10 English entropies:")
-    # best10_non_eng_ents = non_eng_ents[:10]
-    # ppEandT(best10_non_eng_ents)
-    # print("Worst 10 English entropies:")
-    # worst10_non_eng_ents = non_eng_ents[-10:]
-    # ppEandT(worst10_non_eng_ents)
-    #
-    # print("*** Question 6 ***")
-    # answer_open_question_6 = open_question_6()
-    # print(answer_open_question_6)
+    print("*** Part I***\n")
+
+    print("*** Question 1 ***")
+    print('Building brown bigram letter model ... ')
+    lm = train_LM(brown)
+    print('Letter model built')
+
+    print("*** Question 2 ***")
+    ents = tweet_ent(twitter_file_ids, lm)
+    print("Best 10 english entropies:")
+    best10_ents = ents[:10]
+    ppEandT(best10_ents)
+    print("Worst 10 english entropies:")
+    worst10_ents = ents[-10:]
+    ppEandT(worst10_ents)
+
+    print("*** Question 3 ***")
+    answer_open_question_3 = open_question_3()
+    print(answer_open_question_3)
+
+    print("*** Question 4 ***")
+    answer_open_question_4 = open_question_4()
+    print(answer_open_question_4)
+
+    print("*** Question 5 ***")
+    mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
+    print('Mean: {}'.format(mean))
+    print('Standard Deviation: {}'.format(std))
+    print('ASCII tweets ')
+    print("Best 10 English entropies:")
+    best10_ascci_ents = ascci_ents[:10]
+    ppEandT(best10_ascci_ents)
+    print("Worst 10 English entropies:")
+    worst10_ascci_ents = ascci_ents[-10:]
+    ppEandT(worst10_ascci_ents)
+    print('--------')
+    print('Tweets considered non-English')
+    print("Best 10 English entropies:")
+    best10_non_eng_ents = non_eng_ents[:10]
+    ppEandT(best10_non_eng_ents)
+    print("Worst 10 English entropies:")
+    worst10_non_eng_ents = non_eng_ents[-10:]
+    ppEandT(worst10_non_eng_ents)
+
+    print("*** Question 6 ***")
+    answer_open_question_6 = open_question_6()
+    print(answer_open_question_6)
 
 
     print("*** Part II***\n")
@@ -567,18 +581,18 @@ def answers():
 
     # A single iteration of suffices for logistic regression for the simple feature extractors.
     #
-    # extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, eature_extractor_4, feature_extractor_5]
-    #
-    # print("Extractor    |  Accuracy")
-    # print("------------------------")
-    #
-    # for i, ex_f in enumerate(extractors, start=1):
-    #     training_features = apply_extractor(ex_f, ppattach.tuples("training"))
-    #     dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
-    #
-    #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
-    #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
-    #     print(f"Extractor {i}  |  {lr_acc*100}")
+    extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, feature_extractor_4, feature_extractor_5]
+
+    print("Extractor    |  Accuracy")
+    print("------------------------")
+
+    for i, ex_f in enumerate(extractors_and_iterations, start=1):
+        training_features = apply_extractor(ex_f, ppattach.tuples("training"))
+        dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
+
+        a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
+        lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
+        print(f"Extractor {i}  |  {lr_acc*100}")
 
 
     print("*** Question 9 ***")
