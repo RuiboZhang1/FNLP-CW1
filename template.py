@@ -69,7 +69,7 @@ def compute_accuracy(classifier, data):
     for d, gold in data:
         predicted = classifier.classify(d)
         correct += predicted == gold
-    return correct/len(data)
+    return correct / len(data)
 
 
 def apply_extractor(extractor_f, data):
@@ -95,6 +95,7 @@ class NltkClassifierWrapper:
     This is a little wrapper around the nltk classifiers so that we can interact with them
     in the same way as the Naive Bayes classifier.
     """
+
     def __init__(self, classifier_class, train_features, **kwargs):
         """
 
@@ -127,8 +128,9 @@ class NltkClassifierWrapper:
         """
         return self.classifier_obj.classify(NltkClassifierWrapper.list_to_freq_dict(d))
 
-    def show_most_informative_features(self, n = 10):
+    def show_most_informative_features(self, n=10):
         self.classifier_obj.show_most_informative_features(n)
+
 
 # End helper functions
 
@@ -155,7 +157,7 @@ def train_LM(corpus):
     for word in corpus.words():
         if (word.isalpha()):
             corpus_tokens.append(word.lower())
-    
+
     # Return a smoothed (using the default estimator) padded bigram
     # letter language model
     return LgramModel(2, corpus_tokens, pad_left=True, pad_right=True)
@@ -193,7 +195,6 @@ def tweet_ent(file_name, bigram_model):
         if (token_count >= 5):
             cleaned_list_of_tweets.append(alpha_tweet)
 
-
     entro_tweet_pairs = []
 
     for tweet in cleaned_list_of_tweets:
@@ -202,7 +203,7 @@ def tweet_ent(file_name, bigram_model):
             word_entro = bigram_model.entropy(word, True, True, False, True)
             tweet_entro += word_entro
 
-        entro_tweet_pairs.append((tweet_entro/len(tweet), tweet))
+        entro_tweet_pairs.append((tweet_entro / len(tweet), tweet))
 
     entro_tweet_pairs.sort()
 
@@ -241,7 +242,8 @@ def open_question_4() -> str:
     return inspect.cleandoc("""-- Using isalpha() will keep many non-English words. We could use isascii() to filter words instead of isalpha().
     -- There are many URLs, mentions and hashtags inside he data. Could replace them using re package. Replace (http\S*) | (@\S*) | (#\S*) with empty string.
     -- There are many misspellings in the data, we should correct them before doing further training.
-    -- Some punctuation marks can be removed (e.g. "*" and "-" in "*Fad-ing*" by replacing [-;):(*] with empty string.""")[0:500]
+    -- Some punctuation marks can be removed (e.g. "*" and "-" in "*Fad-ing*" by replacing [-;):(*] with empty string.""")[
+           0:500]
 
 
 # Question 5 [15 marks]
@@ -300,7 +302,18 @@ def open_question_6():
     :rtype: str
     :return: your answer [1000 chars max]
     """
-    return inspect.cleandoc("""...""")[:1000]
+    return inspect.cleandoc("""1 The average per word entropy of English is hard to be defined by estimating only few 
+    corpora. Assumption: Compute per word entropy of many corpora and average them to approximate the average per word 
+    entropy of English.
+    2 Different models will give different result of the word entropy. It is hard to find the average per word entropy
+     by using only one models. Assumption: Pick few models that could give the best result in computing then average them 
+     to approximate the average per word entropy.
+    3 We compute the per word cross-entropy. The cross-entropy must larger or equal to the true entropy. 
+    Assumption: the cross-entropy equals to the true entropy. 
+    - Pick 10 corpora from different domains and pick 5 language models.For each corpus, the per-word entropy of each 
+    model is calculated, then average the best three models to obtain the per word entropy of the corpus. Next,the 
+    per word entropy of each corpus is summed and then averaged to obtain the final per-word entropy of English.""")[
+           :1000]
 
 
 #############################################
@@ -432,6 +445,7 @@ class NaiveBayes:
 
         return max_label
 
+
 # Question 8 [10 marks]
 def open_question_8() -> str:
     """
@@ -484,9 +498,10 @@ def your_feature_extractor(v, n1, p, n2):
 
     # v = lemmatizer.lemmatize(v)
     n1 = lemmatizer.lemmatize(n1)
-    #n2 = lemmatizer.lemmatize(n2)
+    # n2 = lemmatizer.lemmatize(n2)
 
-    return [("v", v), ("p", p), ("v+p", v+p), ("n1+p", n1+p), ("n2+p", n2+p)]
+    return [("v", v), ("p", p), ("v+p", v + p), ("n1+p", n1 + p), ("n2+p", n2 + p)]
+
 
 # Question 9.2 [10 marks]
 def open_question_9():
@@ -505,12 +520,13 @@ Format the output of your submission for both development and automarking.
 !!!!! DO NOT MODIFY THIS PART !!!!!
 """
 
+
 def answers():
     # Global variables for answers that will be used by automarker
     global ents, lm
     global best10_ents, worst10_ents, mean, std, best10_ascci_ents, worst10_ascci_ents
     global best10_non_eng_ents, worst10_non_eng_ents
-    global answer_open_question_4, answer_open_question_3, answer_open_question_6,\
+    global answer_open_question_4, answer_open_question_3, answer_open_question_6, \
         answer_open_question_8, answer_open_question_9
     global ascci_ents, non_eng_ents
 
@@ -519,98 +535,95 @@ def answers():
 
     print("*** Part I***\n")
 
-    print("*** Question 1 ***")
-    print('Building brown bigram letter model ... ')
-    lm = train_LM(brown)
-    print('Letter model built')
-
-    print("*** Question 2 ***")
-    ents = tweet_ent(twitter_file_ids, lm)
-    print("Best 10 english entropies:")
-    best10_ents = ents[:10]
-    ppEandT(best10_ents)
-    print("Worst 10 english entropies:")
-    worst10_ents = ents[-10:]
-    ppEandT(worst10_ents)
-
-    print("*** Question 3 ***")
-    answer_open_question_3 = open_question_3()
-    print(answer_open_question_3)
-
-    print("*** Question 4 ***")
-    answer_open_question_4 = open_question_4()
-    print(answer_open_question_4)
-
-    print("*** Question 5 ***")
-    mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
-    print('Mean: {}'.format(mean))
-    print('Standard Deviation: {}'.format(std))
-    print('ASCII tweets ')
-    print("Best 10 English entropies:")
-    best10_ascci_ents = ascci_ents[:10]
-    ppEandT(best10_ascci_ents)
-    print("Worst 10 English entropies:")
-    worst10_ascci_ents = ascci_ents[-10:]
-    ppEandT(worst10_ascci_ents)
-    print('--------')
-    print('Tweets considered non-English')
-    print("Best 10 English entropies:")
-    best10_non_eng_ents = non_eng_ents[:10]
-    ppEandT(best10_non_eng_ents)
-    print("Worst 10 English entropies:")
-    worst10_non_eng_ents = non_eng_ents[-10:]
-    ppEandT(worst10_non_eng_ents)
+    # print("*** Question 1 ***")
+    # print('Building brown bigram letter model ... ')
+    # lm = train_LM(brown)
+    # print('Letter model built')
+    #
+    # print("*** Question 2 ***")
+    # ents = tweet_ent(twitter_file_ids, lm)
+    # print("Best 10 english entropies:")
+    # best10_ents = ents[:10]
+    # ppEandT(best10_ents)
+    # print("Worst 10 english entropies:")
+    # worst10_ents = ents[-10:]
+    # ppEandT(worst10_ents)
+    #
+    # print("*** Question 3 ***")
+    # answer_open_question_3 = open_question_3()
+    # print(answer_open_question_3)
+    #
+    # print("*** Question 4 ***")
+    # answer_open_question_4 = open_question_4()
+    # print(answer_open_question_4)
+    #
+    # print("*** Question 5 ***")
+    # mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
+    # print('Mean: {}'.format(mean))
+    # print('Standard Deviation: {}'.format(std))
+    # print('ASCII tweets ')
+    # print("Best 10 English entropies:")
+    # best10_ascci_ents = ascci_ents[:10]
+    # ppEandT(best10_ascci_ents)
+    # print("Worst 10 English entropies:")
+    # worst10_ascci_ents = ascci_ents[-10:]
+    # ppEandT(worst10_ascci_ents)
+    # print('--------')
+    # print('Tweets considered non-English')
+    # print("Best 10 English entropies:")
+    # best10_non_eng_ents = non_eng_ents[:10]
+    # ppEandT(best10_non_eng_ents)
+    # print("Worst 10 English entropies:")
+    # worst10_non_eng_ents = non_eng_ents[-10:]
+    # ppEandT(worst10_non_eng_ents)
 
     print("*** Question 6 ***")
     answer_open_question_6 = open_question_6()
     print(answer_open_question_6)
 
-
-    print("*** Part II***\n")
-
-    print("*** Question 7 ***")
-    naive_bayes = NaiveBayes(apply_extractor(feature_extractor_5, ppattach.tuples("training")), 0.1)
-    naive_bayes_acc = compute_accuracy(naive_bayes, apply_extractor(feature_extractor_5, ppattach.tuples("devset")))
-    print(f"Accuracy on the devset: {naive_bayes_acc * 100}%")
-
-    print("*** Question 8 ***")
-    answer_open_question_8 = open_question_8()
-    print(answer_open_question_8)
+    # print("*** Part II***\n")
+    #
+    # print("*** Question 7 ***")
+    # naive_bayes = NaiveBayes(apply_extractor(feature_extractor_5, ppattach.tuples("training")), 0.1)
+    # naive_bayes_acc = compute_accuracy(naive_bayes, apply_extractor(feature_extractor_5, ppattach.tuples("devset")))
+    # print(f"Accuracy on the devset: {naive_bayes_acc * 100}%")
+    #
+    # print("*** Question 8 ***")
+    # answer_open_question_8 = open_question_8()
+    # print(answer_open_question_8)
 
     # This is the code that generated the results in the table of the CW:
 
     # A single iteration of suffices for logistic regression for the simple feature extractors.
     #
-    extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, feature_extractor_4, feature_extractor_5]
-
-    print("Extractor    |  Accuracy")
-    print("------------------------")
-
-    for i, ex_f in enumerate(extractors_and_iterations, start=1):
-        training_features = apply_extractor(ex_f, ppattach.tuples("training"))
-        dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
-
-        a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
-        lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
-        print(f"Extractor {i}  |  {lr_acc*100}")
-
-
-    print("*** Question 9 ***")
-    training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
-    dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
-    logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=10)
-    lr_acc = compute_accuracy(logistic_regression_model, dev_features)
-
-    print("30 features with highest absolute weights")
-    logistic_regression_model.show_most_informative_features(30)
-
-    print(f"Accuracy on the devset: {lr_acc*100}")
-
-    answer_open_question_9 = open_question_9()
-    print("Answer to open question:")
-    print(answer_open_question_9)
-
-
+    # extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, feature_extractor_4, feature_extractor_5]
+    #
+    # print("Extractor    |  Accuracy")
+    # print("------------------------")
+    #
+    # for i, ex_f in enumerate(extractors_and_iterations, start=1):
+    #     training_features = apply_extractor(ex_f, ppattach.tuples("training"))
+    #     dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
+    #
+    #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
+    #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
+    #     print(f"Extractor {i}  |  {lr_acc*100}")
+    #
+    #
+    # print("*** Question 9 ***")
+    # training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
+    # dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
+    # logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=10)
+    # lr_acc = compute_accuracy(logistic_regression_model, dev_features)
+    #
+    # print("30 features with highest absolute weights")
+    # logistic_regression_model.show_most_informative_features(30)
+    #
+    # print(f"Accuracy on the devset: {lr_acc*100}")
+    #
+    # answer_open_question_9 = open_question_9()
+    # print("Answer to open question:")
+    # print(answer_open_question_9)
 
 
 if __name__ == "__main__":
