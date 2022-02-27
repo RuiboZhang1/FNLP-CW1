@@ -415,16 +415,27 @@ class NaiveBayes:
         :rtype: dict(str, float)
         :return: The probability p(c|d) for all classes as a dictionary.
         """
-        probs = dict()
+        p_c_given_d = dict()
+
+        p_d = 0
 
         for c in self.prior:
-            prob = self.prior[c]
+            p_d_given_c = 1
             for feature in d:
                 if (feature in self.likelihood[c]):
-                    prob *= self.likelihood[c][feature]
-        probs[c] = prob
+                    p_d_given_c *= self.likelihood[c][feature]
+            p_d += self.prior[c] * p_d_given_c
 
-        return probs
+        for c in self.prior:
+            p_d_given_c = 1
+            for feature in d:
+                if (feature in self.likelihood[c]):
+                    p_d_given_c *= self.likelihood[c][feature]
+
+            p_c_given_d[c] = p_d_given_c * self.prior[c] / p_d
+
+        return p_c_given_d
+
 
     def classify(self, d):
         """
@@ -453,7 +464,12 @@ def open_question_8() -> str:
     :rtype: str
     :return: Your answer of 500 characters maximum.
     """
-    return inspect.cleandoc("""...""")[:500]
+    return inspect.cleandoc("""-Features might common in one class and rare in another. The model 
+    can easily classify class by monitoring these features. However, some features may be common in both classes. 
+    In this case, the model is not confident in predicting the input labels by inspecting these features.
+    -The accuracy of Q7 is 79%, less than logistic regression. Some features provide more information 
+    than others. Logistic regression could assign different weights for features.
+    While naive bayes has same weight.""")[:500]
 
 
 # Feature extractors used in the table:
@@ -535,62 +551,62 @@ def answers():
 
     print("*** Part I***\n")
 
-    # print("*** Question 1 ***")
-    # print('Building brown bigram letter model ... ')
-    # lm = train_LM(brown)
-    # print('Letter model built')
-    #
-    # print("*** Question 2 ***")
-    # ents = tweet_ent(twitter_file_ids, lm)
-    # print("Best 10 english entropies:")
-    # best10_ents = ents[:10]
-    # ppEandT(best10_ents)
-    # print("Worst 10 english entropies:")
-    # worst10_ents = ents[-10:]
-    # ppEandT(worst10_ents)
-    #
-    # print("*** Question 3 ***")
-    # answer_open_question_3 = open_question_3()
-    # print(answer_open_question_3)
-    #
-    # print("*** Question 4 ***")
-    # answer_open_question_4 = open_question_4()
-    # print(answer_open_question_4)
-    #
-    # print("*** Question 5 ***")
-    # mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
-    # print('Mean: {}'.format(mean))
-    # print('Standard Deviation: {}'.format(std))
-    # print('ASCII tweets ')
-    # print("Best 10 English entropies:")
-    # best10_ascci_ents = ascci_ents[:10]
-    # ppEandT(best10_ascci_ents)
-    # print("Worst 10 English entropies:")
-    # worst10_ascci_ents = ascci_ents[-10:]
-    # ppEandT(worst10_ascci_ents)
-    # print('--------')
-    # print('Tweets considered non-English')
-    # print("Best 10 English entropies:")
-    # best10_non_eng_ents = non_eng_ents[:10]
-    # ppEandT(best10_non_eng_ents)
-    # print("Worst 10 English entropies:")
-    # worst10_non_eng_ents = non_eng_ents[-10:]
-    # ppEandT(worst10_non_eng_ents)
+    print("*** Question 1 ***")
+    print('Building brown bigram letter model ... ')
+    lm = train_LM(brown)
+    print('Letter model built')
+
+    print("*** Question 2 ***")
+    ents = tweet_ent(twitter_file_ids, lm)
+    print("Best 10 english entropies:")
+    best10_ents = ents[:10]
+    ppEandT(best10_ents)
+    print("Worst 10 english entropies:")
+    worst10_ents = ents[-10:]
+    ppEandT(worst10_ents)
+
+    print("*** Question 3 ***")
+    answer_open_question_3 = open_question_3()
+    print(answer_open_question_3)
+
+    print("*** Question 4 ***")
+    answer_open_question_4 = open_question_4()
+    print(answer_open_question_4)
+
+    print("*** Question 5 ***")
+    mean, std, ascci_ents, non_eng_ents = tweet_filter(ents)
+    print('Mean: {}'.format(mean))
+    print('Standard Deviation: {}'.format(std))
+    print('ASCII tweets ')
+    print("Best 10 English entropies:")
+    best10_ascci_ents = ascci_ents[:10]
+    ppEandT(best10_ascci_ents)
+    print("Worst 10 English entropies:")
+    worst10_ascci_ents = ascci_ents[-10:]
+    ppEandT(worst10_ascci_ents)
+    print('--------')
+    print('Tweets considered non-English')
+    print("Best 10 English entropies:")
+    best10_non_eng_ents = non_eng_ents[:10]
+    ppEandT(best10_non_eng_ents)
+    print("Worst 10 English entropies:")
+    worst10_non_eng_ents = non_eng_ents[-10:]
+    ppEandT(worst10_non_eng_ents)
 
     print("*** Question 6 ***")
     answer_open_question_6 = open_question_6()
     print(answer_open_question_6)
 
-    # print("*** Part II***\n")
-    #
-    # print("*** Question 7 ***")
-    # naive_bayes = NaiveBayes(apply_extractor(feature_extractor_5, ppattach.tuples("training")), 0.1)
-    # naive_bayes_acc = compute_accuracy(naive_bayes, apply_extractor(feature_extractor_5, ppattach.tuples("devset")))
-    # print(f"Accuracy on the devset: {naive_bayes_acc * 100}%")
-    #
-    # print("*** Question 8 ***")
-    # answer_open_question_8 = open_question_8()
-    # print(answer_open_question_8)
+    print("*** Part II***\n")
+
+    print("*** Question 7 ***")
+    naive_bayes = NaiveBayes(apply_extractor(feature_extractor_5, ppattach.tuples("training")), 0.1)
+    naive_bayes_acc = compute_accuracy(naive_bayes, apply_extractor(feature_extractor_5, ppattach.tuples("devset")))
+    print(f"Accuracy on the devset: {naive_bayes_acc * 100}%")
+
+    print("*** Question 8 ***")
+    answer_open_question_8 = open_question_8()
+    print(answer_open_question_8)
 
     # This is the code that generated the results in the table of the CW:
 
