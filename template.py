@@ -405,7 +405,7 @@ class NaiveBayes:
                         count_total_features += len(features)
                 likelihood[c][feature] = (count_feature + alpha) / (count_total_features + alpha * len(vocab))
 
-        return (prior, likelihood)
+        return prior, likelihood
 
     def prob_classify(self, d):
         """
@@ -512,11 +512,11 @@ def your_feature_extractor(v, n1, p, n2):
     """
     lemmatizer = WordNetLemmatizer()
 
-    # v = lemmatizer.lemmatize(v)
+    v = lemmatizer.lemmatize(v)
     n1 = lemmatizer.lemmatize(n1)
-    # n2 = lemmatizer.lemmatize(n2)
 
-    return [("v", v), ("p", p), ("v+p", v + p), ("n1+p", n1 + p), ("n2+p", n2 + p)]
+    return [("v", v), ("p", p), ("v+p", v+p), ("n1+p", n1+p), ("n2+p", n2+p), ("p==of", p == "of"),
+            ("p==on", p == "on")]
 
 
 # Question 9.2 [10 marks]
@@ -528,7 +528,16 @@ def open_question_9():
     :rtype: str
     :return: Your answer of 1000 characters maximum.
     """
-    return inspect.cleandoc("""...""")[:1000]
+    return inspect.cleandoc("""7 features in my template could give 84.97% accuracy on the devset. 
+    I lemmatize words to reduce the sparse data. Prep or verb itself could provide many information.
+    The combinations of Prep with nouns or verbs are useful as well. I also include two boolean features for estimating 
+    the Prep since they are very common in one label while rare in the other one.
+    1. 4.401 ('v+p', 'assumeof')==1 label:'V'. This feature not make sense. The model confident in predicting 
+    'V' when seeing these two elements. However, most of the pp will attach to ‘N’ when “p==of”. The model might overfitting.
+    2. -3.530 ('v+p', 'roseto')==1 label:'N'. This feature makes sense. PP will usually attached to the 
+    verb when "p==to". Therefore, this feature has a negative weight when the label is ‘N’.
+    3. -3.225 ('p==of', True)==1 label:'V'. This feature makes sense. PP will usually attached to the 
+    verb when "p==of". Therefore, this feature has a negative weight when the label is ‘N’.""")[:1000]
 
 
 """
@@ -612,34 +621,34 @@ def answers():
 
     # A single iteration of suffices for logistic regression for the simple feature extractors.
     #
-    # extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, feature_extractor_4, feature_extractor_5]
-    #
-    # print("Extractor    |  Accuracy")
-    # print("------------------------")
-    #
-    # for i, ex_f in enumerate(extractors_and_iterations, start=1):
-    #     training_features = apply_extractor(ex_f, ppattach.tuples("training"))
-    #     dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
-    #
-    #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
-    #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
-    #     print(f"Extractor {i}  |  {lr_acc*100}")
-    #
-    #
-    # print("*** Question 9 ***")
-    # training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
-    # dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
-    # logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=10)
-    # lr_acc = compute_accuracy(logistic_regression_model, dev_features)
-    #
-    # print("30 features with highest absolute weights")
-    # logistic_regression_model.show_most_informative_features(30)
-    #
-    # print(f"Accuracy on the devset: {lr_acc*100}")
-    #
-    # answer_open_question_9 = open_question_9()
-    # print("Answer to open question:")
-    # print(answer_open_question_9)
+    extractors_and_iterations = [feature_extractor_1, feature_extractor_2, feature_extractor_3, feature_extractor_4, feature_extractor_5]
+
+    print("Extractor    |  Accuracy")
+    print("------------------------")
+
+    for i, ex_f in enumerate(extractors_and_iterations, start=1):
+        training_features = apply_extractor(ex_f, ppattach.tuples("training"))
+        dev_features = apply_extractor(ex_f, ppattach.tuples("devset"))
+
+        a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
+        lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
+        print(f"Extractor {i}  |  {lr_acc*100}")
+
+
+    print("*** Question 9 ***")
+    training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
+    dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
+    logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=10)
+    lr_acc = compute_accuracy(logistic_regression_model, dev_features)
+
+    print("30 features with highest absolute weights")
+    logistic_regression_model.show_most_informative_features(30)
+
+    print(f"Accuracy on the devset: {lr_acc*100}")
+
+    answer_open_question_9 = open_question_9()
+    print("Answer to open question:")
+    print(answer_open_question_9)
 
 
 if __name__ == "__main__":
